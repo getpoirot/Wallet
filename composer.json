@@ -5,12 +5,12 @@
           "name": "Payam Naderi"
           , "email": "naderi.payam@gmail.com"
       }
-      {
+      ,{
         "name": "Mostafa Kamali"
       }
     ]
     , "require": {
-        "poirot/std": "dev-master"
+        "poirot/std": "dev-devel"
     }
     , "autoload"  : {
       "psr-4": {
