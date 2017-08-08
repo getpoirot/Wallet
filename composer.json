@@ -1,20 +1,25 @@
 {
-    "name": "poirot/wallet"
-    , "authors": [
-      {
-          "name": "Payam Naderi"
-          , "email": "naderi.payam@gmail.com"
-      }
-      ,{
-        "name": "Mostafa Kamali"
-      }
-    ]
-    , "require": {
-        "poirot/std": "dev-devel"
-    }
-    , "autoload"  : {
-      "psr-4": {
-        "Poirot\\Wallet\\": "src/"
-      }
-    }
+  "name": "poirot/wallet"
+, "authors": [
+  {
+    "name": "Payam Naderi"
+  , "email": "naderi.payam@gmail.com"
+  }
+,{
+    "name": "Mostafa Kamali"
+  }
+]
+, "require": {
+  "poirot/std": "dev-devel"
+}
+, "require-dev": {
+  "mmucklo/krumo": "^0.5.0"
+}
+,"minimum-stability":"dev"
+,"prefer=stable":true
+, "autoload"  : {
+  "psr-4": {
+    "Poirot\\Wallet\\": "src/"
+  }
+}
 }

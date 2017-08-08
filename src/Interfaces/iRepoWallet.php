@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Wallet\Interfaces;
 
-use Poirot\Wallet\EntityWallet;
+use Poirot\Wallet\Entity\EntityWallet;
 
 
 interface iRepoWallet

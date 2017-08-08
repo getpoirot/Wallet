@@ -3,6 +3,7 @@ namespace Poirot\Wallet\Repo;
 
 use Poirot\Wallet\Interfaces\iRepoWallet;
 use Poirot\Wallet\Entity\EntityWallet;
+use Poirot\Wallet\helper\MysqlHelper;
 
 
 class RepoMysqlPdo
@@ -32,6 +33,13 @@ class RepoMysqlPdo
      */
     function getCountTotalAmount($uid, $type)
     {
+        $query="SELECT `last_total` FROM `tarnsactions` WHERE uid=\"{$uid}\" AND wallet_type=\"{$type}\" ORDER BY transactions_id DESC LIMIT 1 ";
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->execute();
+        $stmt->setFetchMode(\PDO::FETCH_ASSOC);
+        $result = $stmt->fetch();
+        return $result["last_total"];
 
     }
 
@@ -44,42 +52,39 @@ class RepoMysqlPdo
      */
     function insert(EntityWallet $entityWallet)
     {
-        $prevSql="SELECT 
-    last_total
-FROM
-    `transactions`
-WHERE 
-    uid=$entityWallet->getUid
-AND 
-    wallet_type=$entityWallet->getWalletType
+       // var_dump($entityWallet->getWalletType());
 
-ORDER BY id DESC
-LIMIT 1;;";
 
-        $stmt = $this->conn->prepare($prevSql);
+
+        $query = "SELECT last_total FROM `tarnsactions` WHERE uid={$entityWallet->getUid()} AND wallet_type=\"{$entityWallet->getWalletType()}\" ORDER BY transactions_id DESC LIMIT 1";
+
+        $stmt = $this->conn->prepare($query);
+
         $stmt->execute();
         $stmt->setFetchMode(\PDO::FETCH_ASSOC);
         $result = $stmt->fetch();
+        var_dump($result["last_total"]);
+
+
+
         if (!$result){
             $result=0;
         }
-        $result=$result+$entityWallet->getLastTotal();
-        var_dump($entityWallet);
+        $result=$result["last_total"]+$entityWallet->getAmount();
+        var_dump($result);
 
-        $sql="INSERT INTO transactions (
-                 uid, wallet_type, amount, source, data_created,last_total
-                )
-                VALUES ('{$entityWallet->getUid()}'
-                , '{$entityWallet->getWalletType()}'
-                , '{$entityWallet->getAmount()}'
-                , '{$entityWallet->getSource()}'
-                , '{$entityWallet->getDateCreated()->format('Y/m/d H:i:s')}'
-                , '{$result}'
-                )
-                
-        ";
-        var_dump(2);
+        $sql="INSERT INTO `tarnsactions`( `uid`, `wallet_type`, `amount`, `source`, `data_created`, `last_total`)
+                                  VALUES (\"{$entityWallet->getUid()}\",
+                                          \"{$entityWallet->getWalletType()}\",
+                                          {$entityWallet->getAmount()},
+                                          \"{$entityWallet->getSource()}\",
+                                          \"{$entityWallet->getDateCreated()->format('Y/m/d H:i:s')}\",
+                                          {$result})";
+       // var_dump(2);
         $this->conn->exec($sql);
+
+
+        return $this->conn;
 
 
 
@@ -99,6 +104,29 @@ LIMIT 1;;";
      */
     function find(array $expr, $offset = null, $limit = null, $sort = self::SORT_ASC)
     {
-        // TODO: Implement find() method.
+        $where = '';
+
+        if (! empty($expr) ) {
+
+
+            $qFilter = MysqlHelper::buildMySqlQueryFromExpression($expr);
+            if (isset($qFilter['WHERE']))
+                $where = 'WHERE '. implode(' and ', $qFilter['WHERE']);
+        }
+
+        $query = "
+          SELECT * FROM transactions
+          $where 
+          ORDER BY adsr_id \"{$sort}\"
+          LIMIT ".( ($offset) ? "{$offset}, " : null )."{$limit}
+        ";
+
+        $stmt = $this->q->prepare($query);
+
+        $stmt->execute();
+        $stmt->setFetchMode(\PDO::FETCH_ASSOC);
+        $result = $stmt->fetchAll();
+
+        return $result;
     }
 }
