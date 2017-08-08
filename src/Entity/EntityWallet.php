@@ -10,7 +10,7 @@ class EntityWallet
     protected $uid;
     protected $wallet_type;
     protected $amount;
-    protected $source;
+    protected $target;
     protected $dateCreated;
     protected $last_total;
 
@@ -78,21 +78,21 @@ class EntityWallet
     }
 
     /**
-     * Get a string that any amount come from which source (bank user gift ...)
+     * Get a string that any amount come from which target (bank user gift ...)
      * @return string
      */
-    function getSource()
+    function getTarget()
     {
-        return $this->source;
+        return $this->target;
     }
 
     /**
-     * @param string $source
+     * @param string $target
      * @return $this
      */
-    function setSource($source)
+    function setTarget($target)
     {
-        $this->source = $source;
+        $this->target = $target;
         return $this;
     }
 

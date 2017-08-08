@@ -3,7 +3,6 @@ namespace Poirot\Wallet\Repo;
 
 use Poirot\Wallet\Interfaces\iRepoWallet;
 use Poirot\Wallet\Entity\EntityWallet;
-use Poirot\Wallet\helper\MysqlHelper;
 
 
 class RepoMysqlPdo
@@ -33,9 +32,15 @@ class RepoMysqlPdo
      */
     function getCountTotalAmount($uid, $type)
     {
-        $query="SELECT `last_total` FROM `tarnsactions` WHERE uid=\"{$uid}\" AND wallet_type=\"{$type}\" ORDER BY transactions_id DESC LIMIT 1 ";
+        $query="SELECT `last_total` 
+                FROM `transactions` 
+                WHERE uid = :uid 
+                AND wallet_type= :type 
+                ORDER BY transactions_id 
+                DESC LIMIT 1 ";
         $stmt = $this->conn->prepare($query);
-
+        $stmt->bindParam(':uid', $uid, \PDO::PARAM_STR);
+        $stmt->bindParam(':type', $type, \PDO::PARAM_STR);
         $stmt->execute();
         $stmt->setFetchMode(\PDO::FETCH_ASSOC);
         $result = $stmt->fetch();
@@ -52,44 +57,33 @@ class RepoMysqlPdo
      */
     function insert(EntityWallet $entityWallet)
     {
-       // var_dump($entityWallet->getWalletType());
-
-
-
-        $query = "SELECT last_total FROM `tarnsactions` WHERE uid={$entityWallet->getUid()} AND wallet_type=\"{$entityWallet->getWalletType()}\" ORDER BY transactions_id DESC LIMIT 1";
+        $query = "SELECT last_total FROM `transactions`
+                  WHERE uid={$entityWallet->getUid()} 
+                  AND wallet_type=\"{$entityWallet->getWalletType()}\" 
+                  ORDER BY transactions_id DESC LIMIT 1";
 
         $stmt = $this->conn->prepare($query);
 
         $stmt->execute();
         $stmt->setFetchMode(\PDO::FETCH_ASSOC);
         $result = $stmt->fetch();
-        var_dump($result["last_total"]);
 
-
-
-        if (!$result){
+        if (! $result )
             $result=0;
-        }
-        $result=$result["last_total"]+$entityWallet->getAmount();
-        var_dump($result);
 
-        $sql="INSERT INTO `tarnsactions`( `uid`, `wallet_type`, `amount`, `source`, `data_created`, `last_total`)
+        $result=$result["last_total"]+$entityWallet->getAmount();
+
+        $sql="INSERT INTO `transactions`( `uid`, `wallet_type`, `amount`, `target`, `data_created`, `last_total`)
                                   VALUES (\"{$entityWallet->getUid()}\",
                                           \"{$entityWallet->getWalletType()}\",
                                           {$entityWallet->getAmount()},
-                                          \"{$entityWallet->getSource()}\",
+                                          \"{$entityWallet->getTarget()}\",
                                           \"{$entityWallet->getDateCreated()->format('Y/m/d H:i:s')}\",
                                           {$result})";
-       // var_dump(2);
         $this->conn->exec($sql);
 
 
-        return $this->conn;
-
-
-
-
-
+        return $this->conn->lastInsertId();
     }
 
     /**
@@ -101,29 +95,57 @@ class RepoMysqlPdo
      * @param string $sort
      *
      * @return \Traversable
+     * @throws \Exception
      */
     function find(array $expr, $offset = null, $limit = null, $sort = self::SORT_ASC)
     {
-        $where = '';
+        $where = null;
 
-        if (! empty($expr) ) {
+        if (! empty($expr) )
+        {
+            $q=[];
+            foreach ($expr as $k => $v) {
+                switch ( strtolower($k) ) {
+                    case "uid":
+                        $q['uid'] = "uid = :uid";
+                        break ;
+                    case "wallet_type":
+                        $q['wallet_type'] = "wallet_type = :wallet_type";
+                       break;
+                    case "target":
+                        $q ['target'] = "target = :target";
+                        break;
+                    default:
+                        throw new \Exception(sprintf(
+                            'The Expression (%s) is unknown.'
+                            , $k
+                        ));
+                }
+            }
 
-
-            $qFilter = MysqlHelper::buildMySqlQueryFromExpression($expr);
-            if (isset($qFilter['WHERE']))
-                $where = 'WHERE '. implode(' and ', $qFilter['WHERE']);
+            $where = 'WHERE '.implode(' & ', $q);
         }
+
+
+
 
         $query = "
           SELECT * FROM transactions
-          $where 
-          ORDER BY adsr_id \"{$sort}\"
+          $where
+          ORDER BY  transactions_id $sort
           LIMIT ".( ($offset) ? "{$offset}, " : null )."{$limit}
         ";
 
-        $stmt = $this->q->prepare($query);
+        $stmt = $this->conn->prepare($query);
+        $q = [];
+        foreach ($expr as $k => $v) {
+            $stmt->bindParam(':'.$k, $v,\PDO::PARAM_STR);
+           $q[':'.$k] = $v;
+        }
 
-        $stmt->execute();
+
+
+        $stmt->execute($q);
         $stmt->setFetchMode(\PDO::FETCH_ASSOC);
         $result = $stmt->fetchAll();
 
