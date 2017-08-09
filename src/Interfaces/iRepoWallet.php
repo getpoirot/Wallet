@@ -32,6 +32,12 @@ interface iRepoWallet
     /**
      * Find All Entities Match With Given Expression
      *
+     * $exp: [
+     *   'uid'         => ..,
+     *   'wallet_type' => ..,
+     *   'target'      => ..,
+     * ]
+     *
      * @param array   $expr
      * @param string  $offset
      * @param int     $limit

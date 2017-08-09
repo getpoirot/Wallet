@@ -1,14 +1,14 @@
 <?php
 namespace Poirot\Wallet\Entity;
 
-use MongoDB\BSON\Timestamp;
 use Poirot\Std\Struct\aDataOptions;
+
 
 class EntityWallet
     extends aDataOptions
 {
     protected $uid;
-    protected $wallet_type;
+    protected $walletType;
     protected $amount;
     protected $target;
     protected $dateCreated;
@@ -40,27 +40,32 @@ class EntityWallet
 
     /**
      * Get Type off any record like dollar toman ....
+     *
      * @return string
      */
     function getWalletType()
     {
-        return $this->wallet_type;
+        return $this->walletType;
 
     }
 
     /**
-     * @param string $wallet_type
+     * Set Wallet Type
+     *
+     * @param string $walletType
+     *
      * @return $this
      */
-    function setWalletType($wallet_type)
+    function setWalletType($walletType)
     {
-        $this->wallet_type = $wallet_type;
+        $this->walletType = $walletType;
         return $this;
     }
 
     /**
      * Get amount off any wallet_master
-     * @return float
+     *
+     * @return float|int
      */
     function getAmount()
     {
@@ -78,7 +83,9 @@ class EntityWallet
     }
 
     /**
-     * Get a string that any amount come from which target (bank user gift ...)
+     * Get a string that any amount come from which target
+     * exp. (bank, user, gift ...)
+     *
      * @return string
      */
     function getTarget()
@@ -98,29 +105,21 @@ class EntityWallet
 
     /**
      * Get timestamp of any insert off any record
-     * @return Timestamp
+     *
+     * @return \DateTime
      */
     function getDateCreated()
     {
         if (! $this->dateCreated )
-            $this->setDateCreated(new \DateTime());
+            $this->dateCreated = new \DateTime;
 
 
         return $this->dateCreated;
     }
 
     /**
-     * @param \DateTime $dataCreated
-     * @return $this
-     */
-    function setDateCreated($dataCreated)
-    {
-        $this->dateCreated = $dataCreated;
-        return $this;
-    }
-
-    /**
      * Get last value for wallet_master off any user
+     *
      * @return float
      */
     function getLastTotal()
@@ -137,5 +136,4 @@ class EntityWallet
         $this->last_total = $last_total;
         return $this;
     }
-
 }

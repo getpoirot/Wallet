@@ -32,19 +32,22 @@ class RepoMysqlPdo
      */
     function getCountTotalAmount($uid, $type)
     {
-        $query="SELECT `last_total` 
+        $query = 'SELECT `last_total` 
                 FROM `transactions` 
                 WHERE uid = :uid 
-                AND wallet_type= :type 
+                AND wallet_type = :type 
                 ORDER BY transactions_id 
-                DESC LIMIT 1 ";
+                DESC LIMIT 1 ';
+
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':uid', $uid, \PDO::PARAM_STR);
         $stmt->bindParam(':type', $type, \PDO::PARAM_STR);
+
         $stmt->execute();
         $stmt->setFetchMode(\PDO::FETCH_ASSOC);
         $result = $stmt->fetch();
-        return $result["last_total"];
+
+        return $result['last_total'];
 
     }
 
@@ -57,40 +60,43 @@ class RepoMysqlPdo
      */
     function insert(EntityWallet $entityWallet)
     {
+        $uid          = $entityWallet->getUid();
+        $wallet_type  = $entityWallet->getWalletType();
+        $amount       = $entityWallet->getAmount();
+        $target       = $entityWallet->getTarget();
+        $data_created = $entityWallet->getDateCreated()->format('Y/m/d H:i:s');
 
-        $uid=$entityWallet->getUid();
-        $wallet_type=$entityWallet->getWalletType();
-        $amount=$entityWallet->getAmount();
-        $target=$entityWallet->getTarget();
-        $data_created=$entityWallet->getDateCreated()->format('Y/m/d H:i:s');
 
-
-        $query = "SELECT last_total FROM `transactions`
-                  WHERE uid=:uid 
-                  AND wallet_type=:wallet_type 
-                  ORDER BY transactions_id DESC LIMIT 1";
+        # Get Last Total Amount Of User
+        #
+        $query = 'SELECT last_total FROM `transactions`
+                  WHERE uid = :uid 
+                  AND wallet_type  =:wallet_type 
+                  ORDER BY transactions_id DESC LIMIT 1';
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':uid',$uid);
-        $stmt->bindParam(':wallet_type',$wallet_type);
+        $stmt->bindParam(':uid', $uid);
+        $stmt->bindParam(':wallet_type', $wallet_type);
+
         $stmt->execute();
         $stmt->setFetchMode(\PDO::FETCH_ASSOC);
-        $result = $stmt->fetch();
-
-        if (! $result )
-            $result=0;
+        if (! $lastTotal = $stmt->fetch() )
+            return false;
 
 
-        $result=$result["last_total"]+$entityWallet->getAmount();
-        $sql="INSERT INTO `transactions`( `uid`, `wallet_type`, `amount`, `target`, `data_created`, `last_total`)
-                                  VALUES (?,?,?,?,?,?)";
-        $statment=$this->conn->prepare($sql);
+        # Insert New Entity Include Current Amount + Total Last Amount
+        #
+        $lastTotal = $lastTotal["last_total"] + $entityWallet->getAmount();
+        $sql    = 'INSERT INTO `transactions` 
+            ( `uid`, `wallet_type`, `amount`, `target`, `data_created`, `last_total`)
+            VALUES (?,?,?,?,?,?)';
 
+        $statment = $this->conn->prepare($sql);
         $statment->bindParam(1,$uid);
         $statment->bindParam(2,$wallet_type);
         $statment->bindParam(3,$amount);
         $statment->bindParam(4,$target);
         $statment->bindParam(5,$data_created);
-        $statment->bindParam(6,$result);
+        $statment->bindParam(6,$lastTotal);
         $statment->execute();
 
         return $this->conn->lastInsertId();
@@ -99,10 +105,16 @@ class RepoMysqlPdo
     /**
      * Find All Entities Match With Given Expression
      *
-     * @param array $expr
-     * @param string $offset
-     * @param int $limit
-     * @param string $sort
+     * $exp: [
+     *   'uid'         => ..,
+     *   'wallet_type' => ..,
+     *   'target'      => ..,
+     * ]
+     *
+     * @param array   $expr
+     * @param string  $offset
+     * @param int     $limit
+     * @param string  $sort
      *
      * @return \Traversable
      * @throws \Exception
@@ -137,28 +149,24 @@ class RepoMysqlPdo
         }
 
 
-
-
         $query = "
           SELECT * FROM transactions
           $where
           ORDER BY  transactions_id $sort
-          LIMIT ".( ($offset) ? "{$offset}, " : null )."{$limit}
-        ";
+          LIMIT ".( ($offset) ? "{$offset}, " : null )."{$limit}";
 
         $stmt = $this->conn->prepare($query);
+
         $q = [];
         foreach ($expr as $k => $v) {
             $stmt->bindParam(':'.$k, $v,\PDO::PARAM_STR);
-           $q[':'.$k] = $v;
+            $q[':'.$k] = $v;
         }
-
-
 
         $stmt->execute($q);
         $stmt->setFetchMode(\PDO::FETCH_ASSOC);
-        $result = $stmt->fetchAll();
 
+        $result = $stmt->fetchAll();
         return $result;
     }
 }
