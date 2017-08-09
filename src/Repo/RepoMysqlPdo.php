@@ -57,13 +57,21 @@ class RepoMysqlPdo
      */
     function insert(EntityWallet $entityWallet)
     {
+
+        $uid=$entityWallet->getUid();
+        $wallet_type=$entityWallet->getWalletType();
+        $amount=$entityWallet->getAmount();
+        $target=$entityWallet->getTarget();
+        $data_created=$entityWallet->getDateCreated()->format('Y/m/d H:i:s');
+
+
         $query = "SELECT last_total FROM `transactions`
-                  WHERE uid={$entityWallet->getUid()} 
-                  AND wallet_type=\"{$entityWallet->getWalletType()}\" 
+                  WHERE uid=:uid 
+                  AND wallet_type=:wallet_type 
                   ORDER BY transactions_id DESC LIMIT 1";
-
         $stmt = $this->conn->prepare($query);
-
+        $stmt->bindParam(':uid',$uid);
+        $stmt->bindParam(':wallet_type',$wallet_type);
         $stmt->execute();
         $stmt->setFetchMode(\PDO::FETCH_ASSOC);
         $result = $stmt->fetch();
@@ -71,17 +79,19 @@ class RepoMysqlPdo
         if (! $result )
             $result=0;
 
+
         $result=$result["last_total"]+$entityWallet->getAmount();
-
         $sql="INSERT INTO `transactions`( `uid`, `wallet_type`, `amount`, `target`, `data_created`, `last_total`)
-                                  VALUES (\"{$entityWallet->getUid()}\",
-                                          \"{$entityWallet->getWalletType()}\",
-                                          {$entityWallet->getAmount()},
-                                          \"{$entityWallet->getTarget()}\",
-                                          \"{$entityWallet->getDateCreated()->format('Y/m/d H:i:s')}\",
-                                          {$result})";
-        $this->conn->exec($sql);
+                                  VALUES (?,?,?,?,?,?)";
+        $statment=$this->conn->prepare($sql);
 
+        $statment->bindParam(1,$uid);
+        $statment->bindParam(2,$wallet_type);
+        $statment->bindParam(3,$amount);
+        $statment->bindParam(4,$target);
+        $statment->bindParam(5,$data_created);
+        $statment->bindParam(6,$result);
+        $statment->execute();
 
         return $this->conn->lastInsertId();
     }
