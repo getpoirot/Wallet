@@ -41,9 +41,8 @@ interface iWalletManager
      *
      * @param mixed  $ownerID
      * @param string $typeOfWallet Type of wallet
-     * @param string $target
      *
      * @return float|int Can be negative number
      */
-    function getTotal($ownerID, $typeOfWallet, $target = null);
+    function getTotal($ownerID, $typeOfWallet);
 }

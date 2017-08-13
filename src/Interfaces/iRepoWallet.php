@@ -11,16 +11,6 @@ interface iRepoWallet
 
 
     /**
-     * Get last amount wallet of any user
-     *
-     * @param mixed  $uid
-     * @param string $type
-     *
-     * @return float|int
-     */
-    function getCountTotalAmount($uid, $type);
-
-    /**
      * Persist Entity Object
      *
      * @param EntityWallet $entityWallet
@@ -28,6 +18,16 @@ interface iRepoWallet
      * @return mixed UID
      */
     function insert(EntityWallet $entityWallet);
+
+    /**
+     * Get last amount wallet of any user
+     *
+     * @param mixed   $uid       Owner unique id of wallet
+     * @param string $walletType Wallet type
+     *
+     * @return float|int
+     */
+    function getSumTotalAmount($uid, $walletType);
 
     /**
      * Find All Entities Match With Given Expression
@@ -45,5 +45,5 @@ interface iRepoWallet
      *
      * @return \Traversable
      */
-    function find(array $expr, $offset=null, $limit=null, $sort = self::SORT_ASC);
+    function find(array $expr, $offset = null, $limit = null, $sort = self::SORT_ASC);
 }

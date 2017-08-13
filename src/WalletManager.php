@@ -68,7 +68,19 @@ class WalletManager
      */
     function outgo($ownerID, $amount, $typeOfWallet = "default", $target = 'direct')
     {
+        if ($amount > 0)
+            $amount *= -1;
 
+
+        $wallet = new EntityWallet;
+        $wallet
+            ->setOwnerId($ownerID)
+            ->setWalletType($typeOfWallet)
+            ->setTarget($target)
+            ->setAmount($amount)
+        ;
+
+        $this->repoWallet->insert($wallet);
         return $this;
     }
 
@@ -77,12 +89,11 @@ class WalletManager
      *
      * @param mixed  $ownerID
      * @param string $typeOfWallet Type of wallet
-     * @param string $target
      *
      * @return float|int Can be negative number
      */
-    function getTotal($ownerID, $typeOfWallet = "default", $target = null)
+    function getTotal($ownerID, $typeOfWallet = "default")
     {
-        // TODO: Implement getTotal() method.
+        return $this->repoWallet->getSumTotalAmount($ownerID, $typeOfWallet);
     }
 }

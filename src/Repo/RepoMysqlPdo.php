@@ -10,46 +10,21 @@ class RepoMysqlPdo
 {
     /** @var \PDO */
     private $conn;
+    private $dbname;
 
 
     /**
      * RepoWallet constructor.
      *
-     * @param \PDO $connection
+     * @param \PDO   $connection
+     * @param string $dbname
      */
-    function __construct(\PDO $connection)
+    function __construct(\PDO $connection, $dbname = 'Transactions')
     {
-        $this->conn = $connection;
+        $this->conn   = $connection;
+        $this->dbname = (string) $dbname;
     }
 
-    /**
-     * Get last amount wallet of any user
-     *
-     * @param mixed $uid
-     * @param string $type
-     *
-     * @return float|int
-     */
-    function getCountTotalAmount($uid, $type)
-    {
-        $query = 'SELECT `last_total` 
-                FROM `transactions` 
-                WHERE uid = :uid 
-                AND wallet_type = :type 
-                ORDER BY transactions_id 
-                DESC LIMIT 1 ';
-
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':uid', $uid, \PDO::PARAM_STR);
-        $stmt->bindParam(':type', $type, \PDO::PARAM_STR);
-
-        $stmt->execute();
-        $stmt->setFetchMode(\PDO::FETCH_ASSOC);
-        $result = $stmt->fetch();
-
-        return $result['last_total'];
-
-    }
 
     /**
      * Persist Entity Object
@@ -57,6 +32,7 @@ class RepoMysqlPdo
      * @param EntityWallet $entityWallet
      *
      * @return mixed UID
+     * @throws \Exception
      */
     function insert(EntityWallet $entityWallet)
     {
@@ -69,37 +45,74 @@ class RepoMysqlPdo
 
         # Get Last Total Amount Of User
         #
-        $query = 'SELECT last_total FROM `transactions`
-                  WHERE uid = :uid 
-                  AND wallet_type  =:wallet_type 
-                  ORDER BY transactions_id DESC LIMIT 1';
+        $query = 'SELECT last_total FROM `'.$this->dbname.'`
+                  WHERE uid = :uid
+                  AND wallet_type = :wallet_type 
+                  ORDER BY transaction_id DESC 
+                  LIMIT 1'
+        ;
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':uid', $uid);
-        $stmt->bindParam(':wallet_type', $wallet_type);
-
+        $stmt->bindParam('uid', $uid);
+        $stmt->bindParam('wallet_type', $wallet_type);
         $stmt->execute();
-        $stmt->setFetchMode(\PDO::FETCH_ASSOC);
-        if (! $lastTotal = $stmt->fetch() )
-            return false;
+        $lastTotal = $stmt->fetch(\PDO::FETCH_ASSOC);
 
 
         # Insert New Entity Include Current Amount + Total Last Amount
         #
-        $lastTotal = $lastTotal["last_total"] + $entityWallet->getAmount();
-        $sql    = 'INSERT INTO `transactions` 
-            ( `uid`, `wallet_type`, `amount`, `target`, `data_created`, `last_total`)
-            VALUES (?,?,?,?,?,?)';
+        if ($lastTotal)
+            $lastTotal = $lastTotal["last_total"] + $entityWallet->getAmount();
+        else $lastTotal = $entityWallet->getAmount();
 
-        $statment = $this->conn->prepare($sql);
-        $statment->bindParam(1,$uid);
-        $statment->bindParam(2,$wallet_type);
-        $statment->bindParam(3,$amount);
-        $statment->bindParam(4,$target);
-        $statment->bindParam(5,$data_created);
-        $statment->bindParam(6,$lastTotal);
-        $statment->execute();
+        $sql    = 'INSERT INTO `'.$this->dbname.'` 
+            ( `uid`, `wallet_type`, `amount`, `target`, `date_created`, `last_total`)
+            VALUES (?,?,?,?,?,?)'
+        ;
+
+        $stm = $this->conn->prepare($sql);
+        $stm->bindParam(1,$uid);
+        $stm->bindParam(2,$wallet_type);
+        $stm->bindParam(3,$amount);
+        $stm->bindParam(4,$target);
+        $stm->bindParam(5,$data_created);
+        $stm->bindParam(6,$lastTotal);
+        if ( false === $stm->execute() )
+            throw new \Exception(sprintf(
+                'Error While Insert Into (%s).'
+                , $this->dbname
+            ));
 
         return $this->conn->lastInsertId();
+    }
+
+    /**
+     * Get last amount wallet of any user
+     *
+     * @param mixed   $uid       Owner unique id of wallet
+     * @param string $walletType Wallet type
+     *
+     * @return float|int
+     */
+    function getSumTotalAmount($uid, $walletType)
+    {
+        $query = 'SELECT `last_total` 
+            FROM `'.$this->dbname.'` 
+            WHERE uid = :uid 
+            AND wallet_type = :wtype
+            ORDER BY transaction_id 
+            DESC LIMIT 1 '
+        ;
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':uid', $uid, \PDO::PARAM_STR);
+        $stmt->bindParam(':wtype', $walletType, \PDO::PARAM_STR);
+
+        $stmt->execute();
+        $stmt->setFetchMode(\PDO::FETCH_ASSOC);
+        if ( false === $result = $stmt->fetch() )
+            return 0;
+
+        return $result['last_total'];
     }
 
     /**
@@ -147,7 +160,6 @@ class RepoMysqlPdo
 
             $where = 'WHERE '.implode(' & ', $q);
         }
-
 
         $query = "
           SELECT * FROM transactions
