@@ -7,7 +7,7 @@ use Poirot\Std\Struct\aDataOptions;
 class EntityWallet
     extends aDataOptions
 {
-    protected $uid;
+    protected $ownerId;
     protected $walletType;
     protected $amount;
     protected $target;
@@ -16,37 +16,26 @@ class EntityWallet
 
 
     /**
-     * Get User Id That Belong To Wallet
+     * Set Owner UID Of Wallet
      *
-     * @return string
-     */
-    function getUid()
-    {
-        return $this->uid;
-    }
-
-    /**
-     *
-     *
-     * @param string $uid
+     * @param string $ownerId
      *
      * @return $this
      */
-    function setUid($uid)
+    function setOwnerId($ownerId)
     {
-        $this->uid = $uid;
+        $this->ownerId = $ownerId;
         return $this;
     }
 
     /**
-     * Get Type off any record like dollar toman ....
+     * Get Owner Id That Belong To Wallet
      *
-     * @return string
+     * @return mixed
      */
-    function getWalletType()
+    function getOwnerId()
     {
-        return $this->walletType;
-
+        return $this->ownerId;
     }
 
     /**
@@ -58,14 +47,39 @@ class EntityWallet
      */
     function setWalletType($walletType)
     {
-        $this->walletType = $walletType;
+        $this->walletType = (string) $walletType;
+        return $this;
+    }
+
+    /**
+     * Get Type off any record
+     * exp. dollar, toman,  ..
+     *
+     * @return string
+     */
+    function getWalletType()
+    {
+        return $this->walletType;
+
+    }
+
+    /**
+     * Set Amount
+     *
+     * @param float $amount Positive or Negative
+     *
+     * @return $this
+     */
+    function setAmount($amount)
+    {
+        $this->amount = $amount;
         return $this;
     }
 
     /**
      * Get amount off any wallet_master
      *
-     * @return float|int
+     * @return float|int Negative and Positive
      */
     function getAmount()
     {
@@ -73,12 +87,15 @@ class EntityWallet
     }
 
     /**
-     * @param float $amount
+     * Set Target
+     *
+     * @param string $target
+     *
      * @return $this
      */
-    function setAmount($amount)
+    function setTarget($target)
     {
-        $this->amount = $amount;
+        $this->target = (string) $target;
         return $this;
     }
 
@@ -93,29 +110,6 @@ class EntityWallet
         return $this->target;
     }
 
-    /**
-     * @param string $target
-     * @return $this
-     */
-    function setTarget($target)
-    {
-        $this->target = $target;
-        return $this;
-    }
-
-    /**
-     * Get timestamp of any insert off any record
-     *
-     * @return \DateTime
-     */
-    function getDateCreated()
-    {
-        if (! $this->dateCreated )
-            $this->dateCreated = new \DateTime;
-
-
-        return $this->dateCreated;
-    }
 
     /**
      * Get last value for wallet_master off any user
@@ -135,5 +129,18 @@ class EntityWallet
     {
         $this->last_total = $last_total;
         return $this;
+    }
+
+    /**
+     * Get timestamp of any insert off any record
+     *
+     * @return \DateTime
+     */
+    function getDateCreated()
+    {
+        if (! $this->dateCreated )
+            $this->dateCreated = new \DateTime;
+
+        return $this->dateCreated;
     }
 }

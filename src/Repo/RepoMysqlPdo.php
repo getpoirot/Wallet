@@ -60,7 +60,7 @@ class RepoMysqlPdo
      */
     function insert(EntityWallet $entityWallet)
     {
-        $uid          = $entityWallet->getUid();
+        $uid          = $entityWallet->getOwnerId();
         $wallet_type  = $entityWallet->getWalletType();
         $amount       = $entityWallet->getAmount();
         $target       = $entityWallet->getTarget();
