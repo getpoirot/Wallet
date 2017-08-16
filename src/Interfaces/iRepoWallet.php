@@ -22,12 +22,12 @@ interface iRepoWallet
     /**
      * Get last amount wallet of any user
      *
-     * @param mixed   $uid       Owner unique id of wallet
+     * @param mixed $uid Owner unique id of wallet
      * @param string $walletType Wallet type
      *
      * @return float|int
      */
-    function getSumTotalAmount($uid, $walletType);
+    function getSumTotalAmount($uid, $walletType );
 
     /**
      * Find All Entities Match With Given Expression
@@ -35,7 +35,8 @@ interface iRepoWallet
      * $exp: [
      *   'uid'         => ..,
      *   'wallet_type' => ..,
-     *   'target'      => ..,
+     *   'target'      => ...
+     *   'meta'        => ...
      * ]
      *
      * @param array   $expr

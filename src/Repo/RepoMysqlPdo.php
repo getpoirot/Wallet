@@ -40,6 +40,7 @@ class RepoMysqlPdo
         $wallet_type  = $entityWallet->getWalletType();
         $amount       = $entityWallet->getAmount();
         $target       = $entityWallet->getTarget();
+        $meta         = $entityWallet->getMeta();
         $data_created = $entityWallet->getDateCreated()->format('Y/m/d H:i:s');
 
 
@@ -56,6 +57,7 @@ class RepoMysqlPdo
         $stmt->bindParam('wallet_type', $wallet_type);
         $stmt->execute();
         $lastTotal = $stmt->fetch(\PDO::FETCH_ASSOC);
+        var_dump($lastTotal);
 
 
         # Insert New Entity Include Current Amount + Total Last Amount
@@ -65,8 +67,8 @@ class RepoMysqlPdo
         else $lastTotal = $entityWallet->getAmount();
 
         $sql    = 'INSERT INTO `'.$this->dbname.'` 
-            ( `uid`, `wallet_type`, `amount`, `target`, `date_created`, `last_total`)
-            VALUES (?,?,?,?,?,?)'
+            ( `uid`, `wallet_type`, `amount`, `target`, `date_created`, `last_total`,`meta`)
+            VALUES (?,?,?,?,?,?,?)'
         ;
 
         $stm = $this->conn->prepare($sql);
@@ -76,6 +78,8 @@ class RepoMysqlPdo
         $stm->bindParam(4,$target);
         $stm->bindParam(5,$data_created);
         $stm->bindParam(6,$lastTotal);
+        $stm->bindParam(7,$meta);
+
         if ( false === $stm->execute() )
             throw new \Exception(sprintf(
                 'Error While Insert Into (%s).'
@@ -149,6 +153,9 @@ class RepoMysqlPdo
                        break;
                     case "target":
                         $q ['target'] = "target = :target";
+                        break;
+                    case "meta":
+                        $q ['meta'] = "meta = :meta";
                         break;
                     default:
                         throw new \Exception(sprintf(

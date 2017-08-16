@@ -13,6 +13,8 @@ class EntityWallet
     protected $target;
     protected $dateCreated;
     protected $last_total;
+    protected $meta;
+
 
 
     /**
@@ -110,6 +112,34 @@ class EntityWallet
         return $this->target;
     }
 
+    /**
+     * Get a string that include like json ,json,csv, serilize ...
+     * that developer know which must be chosen
+     * exp (if you buy charge refer to factor )
+     *
+     * @return string
+     */
+    public function getMeta()
+    {
+        return $this->meta;
+    }
+
+
+    /**
+     * Set Meta
+     *
+     * @param string $meta
+     *
+     * @return $this
+     */
+    public function setMeta($meta)
+    {
+        $this->meta = (string)$meta;
+        return $this;
+
+    }
+
+
 
     /**
      * Get last value for wallet_master off any user
@@ -143,4 +173,5 @@ class EntityWallet
 
         return $this->dateCreated;
     }
+
 }
