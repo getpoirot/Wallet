@@ -164,8 +164,11 @@ class RepoMysqlPdo
         $query = "
           SELECT * FROM `{$this->dbname}`
           $where
-          ORDER BY  transactions_id $sort
-          LIMIT ".( ($offset) ? "{$offset}, " : null )."{$limit}";
+          ORDER BY  transaction_id $sort
+          ";
+
+        (isset($offset) || isset($limit)) ? $query.= "LIMIT ".( ($offset) ? "{$offset}, " : null )."{$limit}" : null;
+
 
         $stmt = $this->conn->prepare($query);
 
