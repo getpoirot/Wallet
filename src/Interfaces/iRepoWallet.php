@@ -36,7 +36,6 @@ interface iRepoWallet
      *   'uid'         => ..,
      *   'wallet_type' => ..,
      *   'target'      => ...
-     *   'meta'        => ...
      * ]
      *
      * @param array   $expr

@@ -40,8 +40,9 @@ class RepoMysqlPdo
         $wallet_type  = $entityWallet->getWalletType();
         $amount       = $entityWallet->getAmount();
         $target       = $entityWallet->getTarget();
-        $data_created = $entityWallet->getDateCreated()->format('YYYY-MM-DD HH:MM:SS');
+        $data_created = $entityWallet->getDateCreated()->format('Y-m-d H:i:s');
         $meta         = $entityWallet->getMeta();
+
 
         # Get Last Total Amount Of User
         #
@@ -150,9 +151,6 @@ class RepoMysqlPdo
                        break;
                     case "target":
                         $q ['target'] = "target = :target";
-                        break;
-                    case "meta":
-                        $q ['meta'] = "meta = :meta";
                         break;
                     default:
                         throw new \Exception(sprintf(
