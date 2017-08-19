@@ -1,9 +1,6 @@
 <?php
 namespace Poirot\Wallet\Interfaces;
 
-
-use Poirot\Std\Interfaces\Pact\ipMetaProvider;
-
 interface iWalletManager
 {
     /**
@@ -25,7 +22,7 @@ interface iWalletManager
      *
      * @return $this
      */
-    function income($ownerID, $amount, $typeOfWallet, $target ,$meta);
+    function income($ownerID, $amount, $typeOfWallet, $target, $meta = null);
 
     /**
      * OutGo For Wallet Owner
@@ -37,7 +34,7 @@ interface iWalletManager
      *
      * @return $this
      */
-    function outgo($ownerID, $amount, $typeOfWallet, $target,$meta);
+    function outgo($ownerID, $amount, $typeOfWallet, $target, $meta = null);
 
     /**
      * Get Total Cost Of Wallet Owner

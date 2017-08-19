@@ -36,7 +36,7 @@ class WalletManager
      * @return $this
      * @throws \Exception
      */
-    function income($ownerID, $amount, $typeOfWallet = "default", $target = 'direct',$meta=null)
+    function income($ownerID, $amount, $typeOfWallet = "default", $target = 'direct', $meta=null)
     {
         if ($amount < 0)
             // Negative Values No Allowed!
@@ -69,7 +69,7 @@ class WalletManager
      * @param string    $meta        what of meta data of amount of transactions
      * @return $this
      */
-    function outgo($ownerID, $amount, $typeOfWallet = "default", $target = 'direct',$meta=null)
+    function outgo($ownerID, $amount, $typeOfWallet = "default", $target = 'direct', $meta=null)
     {
         if ($amount > 0)
             $amount *= -1;
