@@ -40,8 +40,7 @@ class RepoMysqlPdo
         $wallet_type  = $entityWallet->getWalletType();
         $amount       = $entityWallet->getAmount();
         $target       = $entityWallet->getTarget();
-        $data_created = $entityWallet->getDateCreated()->format('Y/m/d H:i:s');
-
+        $data_created = $entityWallet->getDateCreated()->format('YYYY-MM-DD HH:MM:SS');
 
         # Get Last Total Amount Of User
         #
