@@ -2,6 +2,8 @@
 namespace Poirot\Wallet\Interfaces;
 
 
+use Poirot\Std\Interfaces\Pact\ipMetaProvider;
+
 interface iWalletManager
 {
     /**
@@ -19,27 +21,28 @@ interface iWalletManager
      * @param int|float $amount
      * @param string    $typeOfWallet Type of wallet
      * @param string    $target       Who or What is the reason of this charge
+     * @param string    $meta         if you buy charge  get factor
      *
      * @return $this
      */
-    function income($ownerID, $amount, $typeOfWallet, $target);
+    function income($ownerID, $amount, $typeOfWallet, $target ,$meta);
 
     /**
      * OutGo For Wallet Owner
-     *
      * @param mixed     $ownerID      Affected wallet owner
      * @param int|float $amount
      * @param string    $typeOfWallet Type of wallet
      * @param string    $target       Who or What is the reason of this charge
+     * @param string    $meta        what of meta data of amount of transactions
      *
      * @return $this
      */
-    function outgo($ownerID, $amount, $typeOfWallet, $target);
+    function outgo($ownerID, $amount, $typeOfWallet, $target,$meta);
 
     /**
      * Get Total Cost Of Wallet Owner
      *
-     * @param mixed  $ownerID
+     * @param mixed $ownerID
      * @param string $typeOfWallet Type of wallet
      *
      * @return float|int Can be negative number

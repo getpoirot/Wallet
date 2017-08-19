@@ -27,15 +27,16 @@ class WalletManager
     /**
      * InCome For Wallet Owner
      *
-     * @param mixed     $ownerID      Affected wallet owner
+     * @param mixed $ownerID Affected wallet owner
      * @param int|float $amount
-     * @param string    $typeOfWallet Type of wallet
-     * @param string    $target       Who or What is the reason of this charge
+     * @param string $typeOfWallet Type of wallet
+     * @param string $target Who or What is the reason of this charge
      *
+     * @param string    $meta         if you buy charge  get factor
      * @return $this
      * @throws \Exception
      */
-    function income($ownerID, $amount, $typeOfWallet = "default", $target = 'direct')
+    function income($ownerID, $amount, $typeOfWallet = "default", $target = 'direct',$meta=null)
     {
         if ($amount < 0)
             // Negative Values No Allowed!
@@ -50,6 +51,7 @@ class WalletManager
             ->setWalletType($typeOfWallet)
             ->setTarget($target)
             ->setAmount($amount)
+            ->setMeta($meta)
         ;
 
         $this->repoWallet->insert($wallet);
@@ -59,14 +61,15 @@ class WalletManager
     /**
      * OutGo For Wallet Owner
      *
-     * @param mixed     $ownerID      Affected wallet owner
+     * @param mixed $ownerID Affected wallet owner
      * @param int|float $amount
-     * @param string    $typeOfWallet Type of wallet
-     * @param string    $target       Who or What is the reason of this charge
+     * @param string $typeOfWallet Type of wallet
+     * @param string $target Who or What is the reason of this charge
      *
+     * @param string    $meta        what of meta data of amount of transactions
      * @return $this
      */
-    function outgo($ownerID, $amount, $typeOfWallet = "default", $target = 'direct')
+    function outgo($ownerID, $amount, $typeOfWallet = "default", $target = 'direct',$meta=null)
     {
         if ($amount > 0)
             $amount *= -1;
@@ -78,6 +81,7 @@ class WalletManager
             ->setWalletType($typeOfWallet)
             ->setTarget($target)
             ->setAmount($amount)
+            ->setMeta($meta)
         ;
 
         $this->repoWallet->insert($wallet);
