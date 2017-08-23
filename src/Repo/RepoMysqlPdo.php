@@ -160,13 +160,13 @@ class RepoMysqlPdo
                 }
             }
 
-            $where = 'WHERE '.implode(' & ', $q);
+            $where = 'WHERE '.implode(' and ', $q);
         }
 
         $query = "
           SELECT * FROM `{$this->dbname}`
           $where
-          ORDER BY  transaction_id $sort
+          ORDER BY transaction_id $sort
           ";
 
         (isset($offset) || isset($limit)) ? $query.= "LIMIT ".( ($offset) ? "{$offset}, " : null )."{$limit}" : null;
@@ -183,7 +183,6 @@ class RepoMysqlPdo
         $stmt->execute($q);
         $stmt->setFetchMode(\PDO::FETCH_ASSOC);
 
-        $result = $stmt->fetchAll();
-        return $result;
+        return $stmt->fetchAll();
     }
 }
