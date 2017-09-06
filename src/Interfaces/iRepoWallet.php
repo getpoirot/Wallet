@@ -15,7 +15,7 @@ interface iRepoWallet
      *
      * @param EntityWallet $entityWallet
      *
-     * @return mixed UID
+     * @return EntityWallet entity
      */
     function insert(EntityWallet $entityWallet);
 

@@ -174,4 +174,15 @@ class EntityWallet
         return $this->dateCreated;
     }
 
+    /**
+     * @param mixed $dateCreated
+     * @return $this
+     */
+
+    function setDateCreated($dateCreated)
+    {
+        $this->dateCreated = $dateCreated;
+
+    }
+
 }
