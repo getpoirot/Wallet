@@ -83,6 +83,7 @@ class RepoMysqlPdo
                 'Error While Insert Into (%s).'
                 , $this->dbname
             ));
+        //Todo return entity
 
         return $this->conn->lastInsertId();
     }

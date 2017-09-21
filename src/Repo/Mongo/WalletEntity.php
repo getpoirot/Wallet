@@ -42,9 +42,9 @@ class WalletEntity
      *
      * @return $this
      */
-    function setDatetimeCreatedMongo(UTCDatetime $date)
+    function setDateTimeCreatedMongo(UTCDatetime $date)
     {
-        $this->setDateCreated($date->toDateTime());
+        $this->setDateTimeCreated($date->toDateTime());
         return $this;
     }
 
@@ -54,9 +54,9 @@ class WalletEntity
      *
      * @return UTCDatetime
      */
-    function getDatetimeCreatedMongo()
+    function getDateTimeCreatedMongo()
     {
-        $dateTime = $this->getDatetimeCreated();
+        $dateTime = $this->getDateTimeCreated();
         return new UTCDatetime($dateTime->getTimestamp() * 1000);
     }
 
@@ -68,25 +68,9 @@ class WalletEntity
      *
      * @return \DateTime
      */
-    function getDatetimeCreated()
+    function getDateTimeCreated()
     {
-        return parent::getDateCreated();
-    }
-
-
-    // ...
-
-    /**
-     * @inheritdoc
-     */
-    function bsonUnserialize(array $data)
-    {
-        if (isset($data['args'])) {
-            $args = \Poirot\Std\toArrayObject($data['args']);
-            $data['args'] = $args;
-        }
-
-        $this->import($data);
+        return parent::getDateTimeCreated();
     }
 
 }

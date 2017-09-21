@@ -11,7 +11,7 @@ class EntityWallet
     protected $walletType;
     protected $amount;
     protected $target;
-    protected $dateCreated;
+    protected $dateTimeCreated;
     protected $last_total;
     protected $meta;
 
@@ -162,27 +162,35 @@ class EntityWallet
     }
 
     /**
-     * Get timestamp of any insert off any record
+     * Set Created Timestamp
      *
-     * @return \DateTime
+     * @param \DateTime|null $dateTimeCreated
+     *
+     * @return $this
      */
-    function getDateCreated()
+    function setDateTimeCreated($dateTimeCreated)
     {
-        if (! $this->dateCreated )
-            $this->dateCreated = new \DateTime;
+        if ( !($dateTimeCreated === null || $dateTimeCreated instanceof \DateTime) )
+            throw new \InvalidArgumentException(sprintf(
+                'Datetime must instance of \Datetime or null; given: (%s).'
+                , \Poirot\Std\flatten($dateTimeCreated)
+            ));
 
-        return $this->dateCreated;
+        $this->dateTimeCreated = $dateTimeCreated;
+        return $this;
     }
 
     /**
-     * @param mixed $dateCreated
-     * @return $this
+     * Get Date Time Created
+     *
+     * @return \DateTime
      */
-
-    function setDateCreated($dateCreated)
+    function getDateTimeCreated()
     {
-        $this->dateCreated = $dateCreated;
+        if (!$this->dateTimeCreated)
+            $this->setDateTimeCreated(new \DateTime);
 
+        return $this->dateTimeCreated;
     }
 
 }

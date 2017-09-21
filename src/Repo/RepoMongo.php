@@ -9,10 +9,12 @@
 namespace Poirot\Wallet\Repo;
 
 
+use MongoDB\Operation\Count;
 use Poirot\Wallet\Entity\EntityWallet;
 use Poirot\Wallet\Interfaces\iRepoWallet;
 use MongoDB\BSON\ObjectID;
 use Module\MongoDriver\Model\Repository\aRepository;
+use Poirot\Wallet\Repo\Mongo\WalletEntity;
 
 class RepoMongo
     extends aRepository
@@ -81,8 +83,6 @@ class RepoMongo
         }
 
 
-        var_dump($lastTotal);
-      //  die();
         $pEntity = new Mongo\WalletEntity();
         $pEntity
             ->setOwnerId( $entityWallet->getOwnerId() )
@@ -91,7 +91,7 @@ class RepoMongo
             ->setTarget( $entityWallet->getTarget() )
             ->setLastTotal($lastTotal )
             ->setMeta($entityWallet->getMeta())
-            ->setDateCreated($entityWallet->getDateCreated())
+            ->setDateTimeCreated($entityWallet->getDateTimeCreated())
         ;
 
         $r = $this->_query()->insertOne($pEntity);
@@ -104,7 +104,7 @@ class RepoMongo
             ->setTarget( $entityWallet->getTarget() )
             ->setLastTotal( $lastTotal )
             ->setMeta($entityWallet->getMeta())
-            ->setDateCreated($entityWallet->getDateCreated())
+            ->setDateTimeCreated($entityWallet->getDateTimeCreated())
         ;
 
         return $rEntity;
@@ -144,7 +144,7 @@ class RepoMongo
      * Find All Entities Match With Given Expression
      *
      * $exp: [
-     *   'uid'         => ..,
+     *   'owner_id'         => ..,
      *   'wallet_type' => ..,
      *   'target'      => ...
      * ]
@@ -152,24 +152,48 @@ class RepoMongo
      * @param array $expr
      * @param string $offset
      * @param int $limit
-     * @param string $sort
+     * @param integer $sort
      *
-     * @return \Traversable
+     * @return EntityWallet[]
      */
-    function find(array $expr, $offset = null, $limit = null, $sort = self::SORT_ASC)
+    function find(array $expr, $offset = null, $limit = null, $sort = self::MONGO_SORT_DESC)
     {
+        $expression=[];
+        $fields=[];
 
-        $r = $this->_query()->find(
-            $expr,
+        foreach ($expr as $k=>$v)
+        {
+            if(!empty($v))
+            {
+                $expression[$k]=$v;
+                $fields[]=$k;
+            }
+        }
+
+        $expression = \Module\MongoDriver\parseExpressionFromArray($expression);
+        $condition  = \Module\MongoDriver\buildMongoConditionFromExpression($expression);
+
+        if ($offset)
+            $condition = [
+                    '_id' => [
+                        '$lt' => $this->attainNextIdentifier($offset),
+                    ]
+                ] + $condition;
+
+
+        $result = $this->_query()->find(
+            $condition,
             [
                 'limit' => $limit,
-                'skip'  => $offset,
+                'sort'  => [
+                    '_id' => $sort,
+                ]
             ]
+
         );
 
 
-        die();
 
-        return $r;
+        return $result;
     }
 }
