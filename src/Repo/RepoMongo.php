@@ -98,7 +98,7 @@ class RepoMongo
 
         $rEntity = new EntityWallet();
         $rEntity
-            ->setOwnerId( $entityWallet->getOwnerId() )
+            ->setOwnerId( $entityWallet->getOwnerId())
             ->setWalletType( $entityWallet->getWalletType() )
             ->setAmount( $entityWallet->getAmount() )
             ->setTarget( $entityWallet->getTarget() )
@@ -132,6 +132,8 @@ class RepoMongo
             ]
         );
 
+
+
         if (!$r)
             return null;
 
@@ -158,11 +160,14 @@ class RepoMongo
      */
     function find(array $expr, $offset = null, $limit = null, $sort = self::MONGO_SORT_DESC)
     {
+
         $expression=[];
         $fields=[];
 
         foreach ($expr as $k=>$v)
         {
+            if ($v instanceof ObjectID)
+                $v=$this->attainNextIdentifier($v);
             if(!empty($v))
             {
                 $expression[$k]=$v;
@@ -191,6 +196,12 @@ class RepoMongo
             ]
 
         );
+
+       
+
+
+
+
 
 
 
