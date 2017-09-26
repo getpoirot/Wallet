@@ -166,8 +166,6 @@ class RepoMongo
 
         foreach ($expr as $k=>$v)
         {
-            if ($v instanceof ObjectID)
-                $v=$this->attainNextIdentifier($v);
             if(!empty($v))
             {
                 $expression[$k]=$v;
@@ -196,15 +194,6 @@ class RepoMongo
             ]
 
         );
-
-       
-
-
-
-
-
-
-
         return $result;
     }
 }
