@@ -1,20 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mostafa
- * Date: 9/6/17
- * Time: 11:20 AM
- */
-
 namespace Poirot\Wallet\Repo;
 
-
-use MongoDB\Operation\Count;
 use Poirot\Wallet\Entity\EntityWallet;
 use Poirot\Wallet\Interfaces\iRepoWallet;
 use MongoDB\BSON\ObjectID;
 use Module\MongoDriver\Model\Repository\aRepository;
 use Poirot\Wallet\Repo\Mongo\WalletEntity;
+
 
 class RepoMongo
     extends aRepository
@@ -60,9 +52,6 @@ class RepoMongo
      */
     function insert(EntityWallet $entityWallet)
     {
-
-
-
         $r = $this->_query()->findOne(
             [
                 'owner_id'=>$entityWallet->getOwnerId(),
@@ -74,13 +63,11 @@ class RepoMongo
                 'sort'  => ['_id' => -1,],
             ]
         );
-        $lastTotal=0;
 
-        if ($r){
-            $lastTotal= $r->getLastTotal()+$entityWallet->getAmount();
-        }else{
-            $lastTotal=$entityWallet->getAmount();
-        }
+        if ($r)
+            $lastTotal = $r->getLastTotal()+$entityWallet->getAmount();
+        else
+            $lastTotal = $entityWallet->getAmount();
 
 
         $pEntity = new Mongo\WalletEntity();
@@ -122,8 +109,8 @@ class RepoMongo
     {
         $r = $this->_query()->findOne(
             [
-                'owner_id'=>$uid,
-                'wallet_type' =>$walletType
+                'owner_id'    => $uid,
+                'wallet_type' => $walletType
 
             ]
             , [
@@ -135,8 +122,7 @@ class RepoMongo
 
 
         if (!$r)
-            return null;
-
+            return 0;
 
 
         return $r->getLastTotal();
