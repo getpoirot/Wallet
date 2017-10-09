@@ -43,6 +43,7 @@ class RepoMongo
         return $objectId;
     }
 
+
     /**
      * Persist Entity Object
      *
@@ -54,12 +55,10 @@ class RepoMongo
     {
         $r = $this->_query()->findOne(
             [
-                'owner_id'=>$entityWallet->getOwnerId(),
-                'wallet_type' =>$entityWallet->getWalletType()
-
+                'owner_id'    => $this->attainNextIdentifier($entityWallet->getOwnerId()),
+                'wallet_type' => $entityWallet->getWalletType(),
             ]
             , [
-
                 'sort'  => ['_id' => -1,],
             ]
         );
@@ -70,28 +69,28 @@ class RepoMongo
             $lastTotal = $entityWallet->getAmount();
 
 
-        $pEntity = new Mongo\WalletEntity();
+        $pEntity = new Mongo\WalletEntity;
         $pEntity
-            ->setOwnerId( $entityWallet->getOwnerId() )
+            ->setOwnerId( $this->attainNextIdentifier($entityWallet->getOwnerId()) )
             ->setWalletType( $entityWallet->getWalletType() )
             ->setAmount( $entityWallet->getAmount() )
             ->setTarget( $entityWallet->getTarget() )
-            ->setLastTotal($lastTotal )
-            ->setMeta($entityWallet->getMeta())
-            ->setDateTimeCreated($entityWallet->getDateTimeCreated())
+            ->setLastTotal( $lastTotal )
+            ->setMeta( $entityWallet->getMeta() )
+            ->setDateTimeCreated( $entityWallet->getDateTimeCreated() )
         ;
 
         $r = $this->_query()->insertOne($pEntity);
 
         $rEntity = new EntityWallet();
         $rEntity
-            ->setOwnerId( $entityWallet->getOwnerId())
+            ->setOwnerId( $r->getInsertedId() )
             ->setWalletType( $entityWallet->getWalletType() )
             ->setAmount( $entityWallet->getAmount() )
             ->setTarget( $entityWallet->getTarget() )
             ->setLastTotal( $lastTotal )
-            ->setMeta($entityWallet->getMeta())
-            ->setDateTimeCreated($entityWallet->getDateTimeCreated())
+            ->setMeta( $entityWallet->getMeta() )
+            ->setDateTimeCreated( $entityWallet->getDateTimeCreated() )
         ;
 
         return $rEntity;
@@ -109,17 +108,13 @@ class RepoMongo
     {
         $r = $this->_query()->findOne(
             [
-                'owner_id'    => $uid,
-                'wallet_type' => $walletType
-
+                'owner_id'    => $this->attainNextIdentifier($uid),
+                'wallet_type' => $walletType,
             ]
             , [
-
                 'sort'  => ['_id' => -1,],
             ]
         );
-
-
 
         if (!$r)
             return 0;
@@ -140,46 +135,33 @@ class RepoMongo
      * @param array $expr
      * @param string $offset
      * @param int $limit
-     * @param integer $sort
+     * @param int|string $sort
      *
-     * @return EntityWallet[]
+     * @return \Poirot\Wallet\Entity\EntityWallet[]
      */
     function find(array $expr, $offset = null, $limit = null, $sort = self::MONGO_SORT_DESC)
     {
-
-        $expression=[];
-        $fields=[];
-
-        foreach ($expr as $k=>$v)
-        {
-            if(!empty($v))
-            {
-                $expression[$k]=$v;
-                $fields[]=$k;
-            }
-        }
-
-        $expression = \Module\MongoDriver\parseExpressionFromArray($expression);
-        $condition  = \Module\MongoDriver\buildMongoConditionFromExpression($expression);
+        $condition  = \Module\MongoDriver\buildMongoConditionFromExpression($expr);
 
         if ($offset)
             $condition = [
-                    '_id' => [
-                        '$lt' => $this->attainNextIdentifier($offset),
-                    ]
-                ] + $condition;
+                '_id' => [
+                    '$lt' => $this->attainNextIdentifier($offset),
+                ]
+            ] + $condition;
 
 
         $result = $this->_query()->find(
-            $condition,
-            [
+            $condition
+            , [
                 'limit' => $limit,
                 'sort'  => [
                     '_id' => $sort,
-                ]
+                ],
             ]
-
         );
+
+
         return $result;
     }
 }
