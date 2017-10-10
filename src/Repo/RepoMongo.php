@@ -141,7 +141,8 @@ class RepoMongo
      */
     function find(array $expr, $offset = null, $limit = null, $sort = self::MONGO_SORT_DESC)
     {
-        $condition  = \Module\MongoDriver\buildMongoConditionFromExpression($expr);
+        $expr      = \Module\MongoDriver\parseExpressionFromArray($expr);
+        $condition = \Module\MongoDriver\buildMongoConditionFromExpression($expr);
 
         if ($offset)
             $condition = [
