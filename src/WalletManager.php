@@ -16,11 +16,11 @@ class WalletManager
     /**
      * iWalletManager constructor.
      *
-     * @param iRepoWallet $repoWallet
+     * @param iRepoWallet $repository
      */
-    function __construct(iRepoWallet $repoWallet)
+    function __construct(iRepoWallet $repository)
     {
-        $this->repoWallet = $repoWallet;
+        $this->repoWallet = $repository;
     }
 
 

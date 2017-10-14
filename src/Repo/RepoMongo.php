@@ -12,6 +12,11 @@ class RepoMongo
     extends aRepository
     implements iRepoWallet
 {
+    protected $typeMap = [
+        'root'     => 'MongoDB\Model\BSONDocument',
+        'array'    => 'array',
+        'document' => 'array',
+    ];
 
     /**
      * Initialize Object
@@ -106,6 +111,7 @@ class RepoMongo
      */
     function getSumTotalAmount($uid, $walletType)
     {
+
         $r = $this->_query()->findOne(
             [
                 'owner_id'    => $this->attainNextIdentifier($uid),
@@ -139,7 +145,7 @@ class RepoMongo
      *
      * @return \Poirot\Wallet\Entity\EntityWallet[]
      */
-    function find(array $expr, $offset = null, $limit = null, $sort = self::MONGO_SORT_DESC)
+    function find(array $expr, $offset = null, $limit = null, $sort = self::SORT_DESC)
     {
         $expr      = \Module\MongoDriver\parseExpressionFromArray($expr);
         $condition = \Module\MongoDriver\buildMongoConditionFromExpression($expr);
@@ -157,7 +163,7 @@ class RepoMongo
             , [
                 'limit' => $limit,
                 'sort'  => [
-                    '_id' => $sort,
+                    '_id' => ($sort == self::SORT_DESC) ? -1 : 1,
                 ],
             ]
         );

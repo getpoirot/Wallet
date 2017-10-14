@@ -6,9 +6,9 @@ interface iWalletManager
     /**
      * iWalletManager constructor.
      *
-     * @param iRepoWallet $repoWallet
+     * @param iRepoWallet $repository
      */
-    function __construct(iRepoWallet $repoWallet);
+    function __construct(iRepoWallet $repository);
 
 
     /**

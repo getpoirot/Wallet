@@ -8,8 +8,6 @@ interface iRepoWallet
 {
     const SORT_ASC  = 'asc';
     const SORT_DESC = 'desc';
-    const MONGO_SORT_ASC  = 1;
-    const MONGO_SORT_DESC = -1;
 
 
     /**
