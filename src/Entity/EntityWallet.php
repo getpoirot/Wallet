@@ -117,7 +117,7 @@ class EntityWallet
      * that developer know which must be chosen
      * exp (if you buy charge refer to factor )
      *
-     * @return mixed
+     * @return array
      */
     public function getMeta()
     {
@@ -128,7 +128,7 @@ class EntityWallet
     /**
      * Set Meta
      *
-     * @param mixed $meta
+     * @param array $meta
      *
      * @return $this
      */
