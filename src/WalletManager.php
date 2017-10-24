@@ -4,6 +4,7 @@ namespace Poirot\Wallet;
 use Poirot\Wallet\Entity\EntityWallet;
 use Poirot\Wallet\Interfaces\iRepoWallet;
 use Poirot\Wallet\Interfaces\iWalletManager;
+use Poirot\Wallet\Repo\Mongo\WalletEntity;
 
 
 class WalletManager
@@ -99,5 +100,26 @@ class WalletManager
     function getTotal($ownerID, $typeOfWallet = "default")
     {
         return $this->repoWallet->getSumTotalAmount($ownerID, $typeOfWallet);
+    }
+
+    /**
+     * @param $ownerID
+     * @param string $typeOfWallet
+     *
+     * @return WalletEntity
+     */
+    function getLastEntry($ownerID, $typeOfWallet = "default")
+    {
+        $r = $this->repoWallet->find([
+            // TODO attainNext Into Interface
+            'owner_id'    => $this->repoWallet->attainNextIdentifier($ownerID),
+            'wallet_type' => $typeOfWallet,
+        ], null, 1, iRepoWallet::SORT_DESC);
+
+        $e = null;
+        foreach ($r as $e)
+            VOID;
+
+        return $e;
     }
 }
