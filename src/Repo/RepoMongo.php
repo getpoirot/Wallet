@@ -25,7 +25,7 @@ class RepoMongo
     protected function __init()
     {
         if (! $this->persist )
-            $this->setModelPersist(new Mongo\WalletEntity());
+            $this->setModelPersist( new Mongo\WalletEntity );
     }
 
     /**
@@ -127,6 +127,27 @@ class RepoMongo
 
 
         return $r->getLastTotal();
+    }
+
+    /**
+     * Find Owner Has Targeted On Specified Item
+     *
+     * @param mixed  $owner
+     * @param mixed  $target
+     * @param string $walletType
+     *
+     * @return WalletEntity|null
+     */
+    function findOneTargeted($owner, $target, $walletType)
+    {
+        $r = $this->_query()->findOne([
+            'owner_id'    => $this->attainNextIdentifier( $owner ),
+            'target'      => $target,
+            'wallet_type' => $walletType
+        ]);
+
+
+        return $r;
     }
 
     /**

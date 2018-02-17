@@ -1,6 +1,9 @@
 <?php
 namespace Poirot\Wallet\Interfaces;
 
+use Poirot\Wallet\Repo\Mongo\WalletEntity;
+
+
 interface iWalletManager
 {
     /**
@@ -45,4 +48,14 @@ interface iWalletManager
      * @return float|int Can be negative number
      */
     function getTotal($ownerID, $typeOfWallet);
+
+    /**
+     * Get Last Transaction Entry
+     *
+     * @param $ownerID
+     * @param string $typeOfWallet
+     *
+     * @return WalletEntity
+     */
+    function getLastEntry($ownerID, $typeOfWallet = "default");
 }

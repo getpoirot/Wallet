@@ -117,11 +117,20 @@ class EntityWallet
      * that developer know which must be chosen
      * exp (if you buy charge refer to factor )
      *
-     * @return array
+     * @param string|null $key
+     *
+     * @return array|mixed|null
      */
-    public function getMeta()
+    function getMeta($key = null)
     {
-        return $this->meta;
+        $meta = $this->meta;
+        if ( null !== $key ) {
+            $key  = (string) $key;
+            $meta = ( isset($meta[$key]) ) ? $meta[$key] : null;
+        }
+
+
+        return $meta;
     }
 
 
@@ -132,7 +141,7 @@ class EntityWallet
      *
      * @return $this
      */
-    public function setMeta($meta)
+    function setMeta($meta)
     {
         $this->meta = $meta;
         return $this;
