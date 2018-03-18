@@ -140,11 +140,37 @@ class RepoMongo
      */
     function findOneTargeted($owner, $target, $walletType)
     {
-        $r = $this->_query()->findOne([
-            'owner_id'    => $this->attainNextIdentifier( $owner ),
-            'target'      => $target,
-            'wallet_type' => $walletType
-        ]);
+        $r = $this->_query()->findOne(
+            [
+                'owner_id'    => $this->attainNextIdentifier( $owner ),
+                'target'      => $target,
+                'wallet_type' => $walletType
+            ]
+            , [
+                'sort' => [
+                    '_id' => -1,
+                ],
+            ]
+        );
+
+
+        return $r;
+    }
+
+
+    function findLastEntry($owner, $walletType)
+    {
+        $r = $this->_query()->findOne(
+            [
+                'owner_id'    => $this->attainNextIdentifier( $owner ),
+                'wallet_type' => $walletType
+            ]
+            , [
+                'sort' => [
+                    '_id' => -1,
+                ],
+            ]
+        );
 
 
         return $r;
