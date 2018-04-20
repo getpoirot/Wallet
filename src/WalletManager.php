@@ -112,16 +112,7 @@ class WalletManager
      */
     function getLastEntry($ownerID, $typeOfWallet = "default")
     {
-        $r = $this->repoWallet->find([
-            // TODO attainNext Into Interface
-            'owner_id'    => $this->repoWallet->attainNextIdentifier($ownerID),
-            'wallet_type' => $typeOfWallet,
-        ], null, 1, iRepoWallet::SORT_DESC);
-
-        $e = null;
-        foreach ($r as $e)
-            VOID;
-
-        return $e;
+        $r = $this->repoWallet->findLastEntry($ownerID, $typeOfWallet);
+        return $r;
     }
 }
