@@ -7,14 +7,6 @@ use Poirot\Wallet\Repo\Mongo\WalletEntity;
 interface iWalletManager
 {
     /**
-     * iWalletManager constructor.
-     *
-     * @param iRepoWallet $repository
-     */
-    function __construct(iRepoWallet $repository);
-
-
-    /**
      * InCome For Wallet Owner
      *
      * @param mixed     $ownerID      Affected wallet owner
